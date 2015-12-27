@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Sandbox</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" />
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="mouseUtil.js"></script>
+    <script src="canvasUtil.js"></script>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="100" height="100"></canvas>
+    <div class="debug">
+        <p>Mouse down: <span class="debug-mousedown"></span></p>
+        <p>Mouse down start pos: <span class="debug-mousedownstartpos"></span></p>
+        <p>Mouse is dragging: <span class="debug-mouseisdragging"></span></p>
+        <p>Mouse pos: <span class="debug-mousepos"></span></p>
+        <p>Mode: <span class="debug-mode"></span></p>
+    </div>
+    <div class="controls">
+        <button>Create Vertices</button>
+        <button>Create Edges</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
