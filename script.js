@@ -9,6 +9,15 @@ var VERTEX_RADIUS = 5;
 var vertices = [];
 var edges = [];
 
+var mode = 'vertex';
+
+var selectedVertex = null;
+
+function setMode(newMode) {
+    mode = newMode;
+    $('.debug-mode').text(mode);
+}
+
 function getVertexUnderMouse() {
     var pos = mouseUtil.mousePos;
     if (mouseUtil.mouseIsDragging) {
@@ -24,6 +33,7 @@ function getVertexUnderMouse() {
             return i;
         }
     }
+
     return null;
 }
 
@@ -52,6 +62,17 @@ function addVertex() {
     });
 }
 
+function addEdge(v1, v2) {
+    if (v1 == v2) {
+        return;
+    }
+    
+    edges.push({
+        v1: v1,
+        v2: v2
+    });
+}
+
 function draw() {
     context.canvas.width  = window.innerWidth;
     context.canvas.height = window.innerHeight;
@@ -59,6 +80,10 @@ function draw() {
     for (var i = 0; i < vertices.length; i++) {
         var vertex = vertices[i];
         canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS);
+    }
+    for (var i = 0; i < edges.length; i++) {
+        var edge = edges[i];
+        canvasUtil.drawLine(context, vertices[edge.v1], vertices[edge.v2]);
     }
 
     updateMouseDebug();
@@ -70,7 +95,24 @@ function init() {
 
     mouseUtil.init(canvas);
     mouseUtil.registerCallback("mouseclick", function() {
-        addVertex();
+        if (mode == 'vertex') {
+            addVertex();
+        } else if (mode == 'edge') {
+            var vert = getVertexUnderMouse();
+
+            if (vert === null) {
+                selectedVertex = null;
+                return;
+            }
+
+            if (selectedVertex === null) {
+                selectedVertex = vert;
+                return;
+            }
+
+            addEdge(selectedVertex, vert);
+            selectedVertex = null;
+        }
     });
     mouseUtil.registerCallback("mousedragstart", function() {
         activeVertex = getVertexUnderMouse();
