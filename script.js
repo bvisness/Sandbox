@@ -5,6 +5,7 @@ var activeVertex = null;
 var activeVertexStartPosition;
 
 var VERTEX_RADIUS = 5;
+var EDGE_DISTANCE_THRESHOLD = 1;
 
 var vertices = [];
 var edges = [];
@@ -12,10 +13,14 @@ var edges = [];
 var mode = 'vertex';
 
 var selectedVertex = null;
+var selectedEdge = null;
 
 function setMode(newMode) {
     mode = newMode;
+    selectedVertex = null;
+    selectedEdge = null;
     $('.debug-mode').text(mode);
+    draw();
 }
 
 function getVertexUnderMouse() {
@@ -30,6 +35,25 @@ function getVertexUnderMouse() {
             Math.abs(pos.x - vertex.x) <= VERTEX_RADIUS &&
             Math.abs(pos.y - vertex.y) <= VERTEX_RADIUS
         ) {
+            return i;
+        }
+    }
+
+    return null;
+}
+
+function getEdgeUnderMouse() {
+    function distance(p1, p2) {
+        return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+    }
+
+    var pos = mouseUtil.mousePos;
+    for (var i = 0; i < edges.length; i++) {
+        var edge = edges[i];
+        var v1 = vertices[edge.v1];
+        var v2 = vertices[edge.v2];
+        var distanceDiff = (distance(v1, pos) + distance(pos, v2)) - distance(v1, v2);
+        if (distanceDiff <= EDGE_DISTANCE_THRESHOLD) {
             return i;
         }
     }
@@ -66,7 +90,7 @@ function addEdge(v1, v2) {
     if (v1 == v2) {
         return;
     }
-    
+
     edges.push({
         v1: v1,
         v2: v2
@@ -79,11 +103,13 @@ function draw() {
 
     for (var i = 0; i < vertices.length; i++) {
         var vertex = vertices[i];
-        canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS);
+        var color = (i == selectedVertex) ? 'red' : 'black';
+        canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS, color);
     }
     for (var i = 0; i < edges.length; i++) {
         var edge = edges[i];
-        canvasUtil.drawLine(context, vertices[edge.v1], vertices[edge.v2]);
+        var color = (i == selectedEdge) ? 'red' : 'black';
+        canvasUtil.drawLine(context, vertices[edge.v1], vertices[edge.v2], color);
     }
 
     updateMouseDebug();
@@ -95,7 +121,19 @@ function init() {
 
     mouseUtil.init(canvas);
     mouseUtil.registerCallback("mouseclick", function() {
-        if (mode == 'vertex') {
+        if (mode == 'select') {
+            var vert = getVertexUnderMouse();
+            if (vert !== null) {
+                selectedVertex = vert;
+                return;
+            }
+
+            var edge = getEdgeUnderMouse();
+            if (edge !== null) {
+                selectedEdge = edge;
+                return;
+            }
+        } else if (mode == 'vertex') {
             addVertex();
         } else if (mode == 'edge') {
             var vert = getVertexUnderMouse();
