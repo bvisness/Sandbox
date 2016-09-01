@@ -12,13 +12,11 @@ var edges = [];
 
 var mode = 'vertex';
 
-var selectedVertex = null;
-var selectedEdge = null;
+var selected = null;
 
 function setMode(newMode) {
     mode = newMode;
-    selectedVertex = null;
-    selectedEdge = null;
+    selected = null;
     $('.debug-mode').text(mode);
     draw();
 }
@@ -103,12 +101,18 @@ function draw() {
 
     for (var i = 0; i < vertices.length; i++) {
         var vertex = vertices[i];
-        var color = (i == selectedVertex) ? 'red' : 'black';
+        var color = 'black';
+        if (selected && selected.type == 'vertex' && i === selected.index) {
+            color = 'red';
+        };
         canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS, color);
     }
     for (var i = 0; i < edges.length; i++) {
         var edge = edges[i];
-        var color = (i == selectedEdge) ? 'red' : 'black';
+        var color = 'black';
+        if (selected && selected.type == 'edge' && i === selected.index) {
+            color = 'red';
+        }
         canvasUtil.drawLine(context, vertices[edge.v1], vertices[edge.v2], color);
     }
 
@@ -124,32 +128,43 @@ function init() {
         if (mode == 'select') {
             var vert = getVertexUnderMouse();
             if (vert !== null) {
-                selectedVertex = vert;
+                selected = {
+                    type: 'vertex',
+                    index: vert
+                };
                 return;
             }
 
             var edge = getEdgeUnderMouse();
             if (edge !== null) {
-                selectedEdge = edge;
+                selected = {
+                    type: 'edge',
+                    index: edge
+                };
                 return;
             }
+
+            selected = null;
         } else if (mode == 'vertex') {
             addVertex();
         } else if (mode == 'edge') {
             var vert = getVertexUnderMouse();
 
             if (vert === null) {
-                selectedVertex = null;
+                selected = null;
                 return;
             }
 
-            if (selectedVertex === null) {
-                selectedVertex = vert;
+            if (selected === null) {
+                selected = {
+                    type: 'vertex',
+                    index: vert
+                };
                 return;
             }
 
-            addEdge(selectedVertex, vert);
-            selectedVertex = null;
+            addEdge(selected.index, vert);
+            selected = null;
         }
     });
     mouseUtil.registerCallback("mousedragstart", function() {
