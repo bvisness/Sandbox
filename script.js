@@ -95,6 +95,27 @@ function addEdge(v1, v2) {
     });
 }
 
+function deleteSelected() {
+    if (selected === null) {
+        return;
+    }
+
+    if (selected.type == 'edge') {
+        edges.splice(selected.index, 1);
+    } else if (selected.type == 'vertex') {
+        var adjacent = edges.filter(function(edge) {
+            return edge.v1 === selected.index || edge.v2 === selected.index;
+        });
+        adjacent.forEach(function(edge) {
+            edges.splice(edges.indexOf(edge), 1);
+        });
+
+        vertices.splice(selected.index, 1);
+    }
+
+    selected = null;
+}
+
 function draw() {
     context.canvas.width  = window.innerWidth;
     context.canvas.height = window.innerHeight;
@@ -194,6 +215,22 @@ function init() {
     mouseUtil.registerCallback("mouseup", function() {
         draw();
     });
+
+    document.addEventListener('keydown', function(e) {
+        var key = e.keyCode;
+        switch (key) {
+            case 8: {
+                deleteSelected();
+                break;
+            }
+            case 46: {
+                deleteSelected();
+                break;
+            }
+        }
+
+        draw();
+    }, false);
 }
 
 init();
