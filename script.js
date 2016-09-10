@@ -1,7 +1,7 @@
 var canvas;
 var context;
 
-var activeVertex = null;
+var activeVertexId = null;
 var activeVertexStartPosition;
 
 var VERTEX_RADIUS = 5;
@@ -21,7 +21,40 @@ function setMode(newMode) {
     draw();
 }
 
-function getVertexUnderMouse() {
+function getVertexById(id) {
+    return vertices.find(function(vertex) {
+        return vertex.id === id;
+    });
+}
+
+function getEdgeById(id) {
+    return edges.find(function(edge) {
+        return edge.id === id;
+    });
+}
+
+function deleteVertexWithId(id) {
+    var adjacent = edges.filter(function(edge) {
+        return edge.v1 === id || edge.v2 === id;
+    });
+    adjacent.forEach(function(edge) {
+        deleteEdgeWithId(edge.id);
+    });
+
+    var index = vertices.findIndex(function(vertex) {
+        return vertex.id === id;
+    });
+    vertices.splice(index, 1);
+}
+
+function deleteEdgeWithId(id) {
+    var index = edges.findIndex(function(edge) {
+        return edge.id === id;
+    });
+    edges.splice(index, 1);
+}
+
+function getIdOfVertexUnderMouse() {
     var pos = mouseUtil.mousePos;
     if (mouseUtil.mouseIsDragging) {
         pos = mouseUtil.mouseDownStartPos;
@@ -33,14 +66,14 @@ function getVertexUnderMouse() {
             Math.abs(pos.x - vertex.x) <= VERTEX_RADIUS &&
             Math.abs(pos.y - vertex.y) <= VERTEX_RADIUS
         ) {
-            return i;
+            return vertex.id;
         }
     }
 
     return null;
 }
 
-function getEdgeUnderMouse() {
+function getIdOfEdgeUnderMouse() {
     function distance(p1, p2) {
         return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
     }
@@ -48,11 +81,11 @@ function getEdgeUnderMouse() {
     var pos = mouseUtil.mousePos;
     for (var i = 0; i < edges.length; i++) {
         var edge = edges[i];
-        var v1 = vertices[edge.v1];
-        var v2 = vertices[edge.v2];
+        var v1 = getVertexById(edge.v1);
+        var v2 = getVertexById(edge.v2);
         var distanceDiff = (distance(v1, pos) + distance(pos, v2)) - distance(v1, v2);
         if (distanceDiff <= EDGE_DISTANCE_THRESHOLD) {
-            return i;
+            return edge.id;
         }
     }
 
@@ -78,10 +111,10 @@ function updateMouseDebug() {
 }
 
 function addVertex() {
-    vertices.push({
-        x: mouseUtil.mousePos.x,
-        y: mouseUtil.mousePos.y
-    });
+    vertices.push(graphUtil.newVertex(
+        mouseUtil.mousePos.x,
+        mouseUtil.mousePos.y
+    ));
 }
 
 function addEdge(v1, v2) {
@@ -89,10 +122,7 @@ function addEdge(v1, v2) {
         return;
     }
 
-    edges.push({
-        v1: v1,
-        v2: v2
-    });
+    edges.push(graphUtil.newEdge(v1, v2));
 }
 
 function deleteSelected() {
@@ -101,16 +131,9 @@ function deleteSelected() {
     }
 
     if (selected.type == 'edge') {
-        edges.splice(selected.index, 1);
+        deleteEdgeWithId(selected.id);
     } else if (selected.type == 'vertex') {
-        var adjacent = edges.filter(function(edge) {
-            return edge.v1 === selected.index || edge.v2 === selected.index;
-        });
-        adjacent.forEach(function(edge) {
-            edges.splice(edges.indexOf(edge), 1);
-        });
-
-        vertices.splice(selected.index, 1);
+        deleteVertexWithId(selected.id);
     }
 
     selected = null;
@@ -123,7 +146,7 @@ function draw() {
     for (var i = 0; i < vertices.length; i++) {
         var vertex = vertices[i];
         var color = 'black';
-        if (selected && selected.type == 'vertex' && i === selected.index) {
+        if (selected && selected.type == 'vertex' && vertex.id === selected.id) {
             color = 'red';
         };
         canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS, color);
@@ -131,10 +154,10 @@ function draw() {
     for (var i = 0; i < edges.length; i++) {
         var edge = edges[i];
         var color = 'black';
-        if (selected && selected.type == 'edge' && i === selected.index) {
+        if (selected && selected.type == 'edge' && edge.id === selected.id) {
             color = 'red';
         }
-        canvasUtil.drawLine(context, vertices[edge.v1], vertices[edge.v2], color);
+        canvasUtil.drawLine(context, getVertexById(edge.v1), getVertexById(edge.v2), color);
     }
 
     updateMouseDebug();
@@ -147,20 +170,20 @@ function init() {
     mouseUtil.init(canvas);
     mouseUtil.registerCallback("mouseclick", function() {
         if (mode == 'select') {
-            var vert = getVertexUnderMouse();
-            if (vert !== null) {
+            var vertId = getIdOfVertexUnderMouse();
+            if (vertId !== null) {
                 selected = {
                     type: 'vertex',
-                    index: vert
+                    id: vertId
                 };
                 return;
             }
 
-            var edge = getEdgeUnderMouse();
-            if (edge !== null) {
+            var edgeId = getIdOfEdgeUnderMouse();
+            if (edgeId !== null) {
                 selected = {
                     type: 'edge',
-                    index: edge
+                    id: edgeId
                 };
                 return;
             }
@@ -169,9 +192,9 @@ function init() {
         } else if (mode == 'vertex') {
             addVertex();
         } else if (mode == 'edge') {
-            var vert = getVertexUnderMouse();
+            var vertId = getIdOfVertexUnderMouse();
 
-            if (vert === null) {
+            if (vertId === null) {
                 selected = null;
                 return;
             }
@@ -179,31 +202,31 @@ function init() {
             if (selected === null) {
                 selected = {
                     type: 'vertex',
-                    index: vert
+                    id: vertId
                 };
                 return;
             }
 
-            addEdge(selected.index, vert);
+            addEdge(selected.id, vertId);
             selected = null;
         }
     });
     mouseUtil.registerCallback("mousedragstart", function() {
-        activeVertex = getVertexUnderMouse();
-        if (activeVertex !== null) {
+        activeVertexId = getIdOfVertexUnderMouse();
+        if (activeVertexId !== null) {
+            var vert = getVertexById(activeVertexId);
             activeVertexStartPosition = {
-                x: vertices[activeVertex].x,
-                y: vertices[activeVertex].y
+                x: vert.x,
+                y: vert.y
             }
         }
     });
     mouseUtil.registerCallback("mousedrag", function() {
         var dragOffset = mouseUtil.getMouseDragOffset();
-        if (activeVertex !== null) {
-            vertices[activeVertex] = {
-                x: activeVertexStartPosition.x + dragOffset.x,
-                y: activeVertexStartPosition.y + dragOffset.y
-            };
+        if (activeVertexId !== null) {
+            var activeVertex = getVertexById(activeVertexId);
+            activeVertex.x = activeVertexStartPosition.x + dragOffset.x;
+            activeVertex.y = activeVertexStartPosition.y + dragOffset.y;
         }
     });
     mouseUtil.registerCallback("mousemove", function() {
