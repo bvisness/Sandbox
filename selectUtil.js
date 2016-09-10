@@ -1,0 +1,23 @@
+var selectUtil = {};
+
+selectUtil.isMultiSelect = function() {
+    return keyUtil.shift
+        || (env == 'pc' && keyUtil.ctrl)
+        || (env == 'mac' && keyUtil.cmd);
+}
+
+selectUtil.vertexIsSelected = function(id) {
+    var result = selected.find(function(selectedThing) {
+        return selectedThing.type == 'vertex' && selectedThing.id === id;
+    });
+
+    return result !== undefined;
+}
+
+selectUtil.edgeIsSelected = function(id) {
+    var result = selected.find(function(selectedThing) {
+        return selectedThing.type == 'edge' && selectedThing.id === id;
+    });
+
+    return result !== undefined;
+}

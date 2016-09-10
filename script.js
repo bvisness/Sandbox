@@ -12,11 +12,16 @@ var edges = [];
 
 var mode = 'vertex';
 
-var selected = null;
+var selected = [];
+
+var env = 'pc';
+if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
+    env = 'mac';
+}
 
 function setMode(newMode) {
     mode = newMode;
-    selected = null;
+    selected = [];
     $('.debug-mode').text(mode);
     draw();
 }
@@ -44,14 +49,18 @@ function deleteVertexWithId(id) {
     var index = vertices.findIndex(function(vertex) {
         return vertex.id === id;
     });
-    vertices.splice(index, 1);
+    if (index !== -1) {
+        vertices.splice(index, 1);
+    }
 }
 
 function deleteEdgeWithId(id) {
     var index = edges.findIndex(function(edge) {
         return edge.id === id;
     });
-    edges.splice(index, 1);
+    if (index !== -1) {
+        edges.splice(index, 1);
+    }
 }
 
 function getIdOfVertexUnderMouse() {
@@ -126,17 +135,15 @@ function addEdge(v1, v2) {
 }
 
 function deleteSelected() {
-    if (selected === null) {
-        return;
-    }
+    selected.forEach(function(selectedThing) {
+        if (selectedThing.type == 'edge') {
+            deleteEdgeWithId(selectedThing.id);
+        } else if (selectedThing.type == 'vertex') {
+            deleteVertexWithId(selectedThing.id);
+        }
+    });
 
-    if (selected.type == 'edge') {
-        deleteEdgeWithId(selected.id);
-    } else if (selected.type == 'vertex') {
-        deleteVertexWithId(selected.id);
-    }
-
-    selected = null;
+    selected = [];
 }
 
 function draw() {
@@ -146,7 +153,7 @@ function draw() {
     for (var i = 0; i < vertices.length; i++) {
         var vertex = vertices[i];
         var color = 'black';
-        if (selected && selected.type == 'vertex' && vertex.id === selected.id) {
+        if (selectUtil.vertexIsSelected(vertex.id)) {
             color = 'red';
         };
         canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS, color);
@@ -154,7 +161,7 @@ function draw() {
     for (var i = 0; i < edges.length; i++) {
         var edge = edges[i];
         var color = 'black';
-        if (selected && selected.type == 'edge' && edge.id === selected.id) {
+        if (selectUtil.edgeIsSelected(edge.id)) {
             color = 'red';
         }
         canvasUtil.drawLine(context, getVertexById(edge.v1), getVertexById(edge.v2), color);
@@ -170,45 +177,48 @@ function init() {
     mouseUtil.init(canvas);
     mouseUtil.registerCallback("mouseclick", function() {
         if (mode == 'select') {
+            if (!selectUtil.isMultiSelect()) {
+                selected = [];
+            }
+
             var vertId = getIdOfVertexUnderMouse();
             if (vertId !== null) {
-                selected = {
+                selected.push({
                     type: 'vertex',
                     id: vertId
-                };
+                });
                 return;
             }
 
             var edgeId = getIdOfEdgeUnderMouse();
             if (edgeId !== null) {
-                selected = {
+                selected.push({
                     type: 'edge',
                     id: edgeId
-                };
+                });
                 return;
             }
-
-            selected = null;
         } else if (mode == 'vertex') {
             addVertex();
+            selected = [];
         } else if (mode == 'edge') {
             var vertId = getIdOfVertexUnderMouse();
 
             if (vertId === null) {
-                selected = null;
+                selected = [];
                 return;
             }
 
-            if (selected === null) {
-                selected = {
+            if (selected.length === 0) {
+                selected.push({
                     type: 'vertex',
                     id: vertId
-                };
+                });
                 return;
             }
 
-            addEdge(selected.id, vertId);
-            selected = null;
+            addEdge(selected[0].id, vertId);
+            selected = [];
         }
     });
     mouseUtil.registerCallback("mousedragstart", function() {
