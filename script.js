@@ -150,14 +150,6 @@ function draw() {
     context.canvas.width  = window.innerWidth;
     context.canvas.height = window.innerHeight;
 
-    for (var i = 0; i < vertices.length; i++) {
-        var vertex = vertices[i];
-        var color = 'black';
-        if (selectUtil.vertexIsSelected(vertex.id)) {
-            color = 'red';
-        };
-        canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS, color);
-    }
     for (var i = 0; i < edges.length; i++) {
         var edge = edges[i];
         var color = 'black';
@@ -165,6 +157,14 @@ function draw() {
             color = 'red';
         }
         canvasUtil.drawLine(context, getVertexById(edge.v1), getVertexById(edge.v2), color);
+    }
+    for (var i = 0; i < vertices.length; i++) {
+        var vertex = vertices[i];
+        var color = 'black';
+        if (selectUtil.vertexIsSelected(vertex.id)) {
+            color = 'red';
+        };
+        canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS, color);
     }
 
     updateMouseDebug();
