@@ -1,8 +1,7 @@
 var canvas;
 var context;
 
-var activeVertexId = null;
-var activeVertexStartPosition;
+var draggingVertexStartPositions;
 
 var VERTEX_RADIUS = 5;
 var EDGE_DISTANCE_THRESHOLD = 1;
@@ -222,21 +221,27 @@ function init() {
         }
     });
     mouseUtil.registerCallback("mousedragstart", function() {
-        activeVertexId = getIdOfVertexUnderMouse();
-        if (activeVertexId !== null) {
-            var vert = getVertexById(activeVertexId);
-            activeVertexStartPosition = {
-                x: vert.x,
-                y: vert.y
+        draggingVertexStartPositions = {};
+        selected.forEach(function(selectedThing) {
+            if (selectedThing.type == 'vertex') {
+                var vertex = getVertexById(selectedThing.id);
+                draggingVertexStartPositions[vertex.id] = {
+                    x: vertex.x,
+                    y: vertex.y
+                };
             }
-        }
+        });
     });
     mouseUtil.registerCallback("mousedrag", function() {
         var dragOffset = mouseUtil.getMouseDragOffset();
-        if (activeVertexId !== null) {
-            var activeVertex = getVertexById(activeVertexId);
-            activeVertex.x = activeVertexStartPosition.x + dragOffset.x;
-            activeVertex.y = activeVertexStartPosition.y + dragOffset.y;
+        for (var draggingVertexId in draggingVertexStartPositions) {
+            if (!draggingVertexStartPositions.hasOwnProperty(draggingVertexId)) {
+                continue;
+            }
+
+            var vertex = getVertexById(parseInt(draggingVertexId, 10));
+            vertex.x = draggingVertexStartPositions[draggingVertexId].x + dragOffset.x;
+            vertex.y = draggingVertexStartPositions[draggingVertexId].y + dragOffset.y;
         }
     });
     mouseUtil.registerCallback("mousemove", function() {
