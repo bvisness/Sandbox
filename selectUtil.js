@@ -2,8 +2,7 @@ var selectUtil = {};
 
 selectUtil.isMultiSelect = function() {
     return keyUtil.shift
-        || (env == 'pc' && keyUtil.ctrl)
-        || (env == 'mac' && keyUtil.cmd);
+        || keyUtil.isPlatformCtrlKey();
 }
 
 selectUtil.vertexIsSelected = function(id) {

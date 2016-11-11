@@ -4,6 +4,11 @@ keyUtil.shift = false;
 keyUtil.ctrl = false;
 keyUtil.cmd = false;
 
+keyUtil.isPlatformCtrlKey = function() {
+    return (env == 'pc' && keyUtil.ctrl)
+        || (env == 'mac' && keyUtil.cmd);
+}
+
 document.addEventListener('keydown', function(e) {
     var key = e.keyCode;
     switch (key) {

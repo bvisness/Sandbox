@@ -306,13 +306,31 @@ function init() {
     document.addEventListener('keydown', function(e) {
         var key = e.keyCode;
         switch (key) {
-            case 8: {
+            case 8: { // backspace
                 deleteSelected();
                 break;
             }
-            case 46: {
+            case 46: { // forward delete
                 deleteSelected();
                 break;
+            }
+            case 65: { // a
+                if (keyUtil.isPlatformCtrlKey()) {
+                    // select all
+                    selected = [];
+                    vertices.forEach(function(vertex) {
+                        selected.push({
+                            type: 'vertex',
+                            id: vertex.id
+                        });
+                    });
+                    edges.forEach(function(edge) {
+                        selected.push({
+                            type: 'edge',
+                            id: edge.id
+                        });
+                    });
+                }
             }
         }
 
