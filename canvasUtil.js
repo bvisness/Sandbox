@@ -15,3 +15,9 @@ canvasUtil.drawCircle = function(context, center, radius, color = 'black') {
     context.fillStyle = color;
     context.fill();
 };
+
+canvasUtil.drawText = function(context, text, origin, color = 'black', size = '14px', font = 'Arial') {
+    context.font = size + ' ' + font;
+    context.fillStyle = color;
+    context.fillText(text, origin.x, origin.y);
+}

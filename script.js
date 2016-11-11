@@ -8,6 +8,7 @@ var EDGE_DISTANCE_THRESHOLD = 1;
 
 var vertices = [];
 var edges = [];
+var labels = [];
 
 var mode = 'vertex';
 
@@ -46,6 +47,13 @@ function deleteVertexWithId(id) {
         deleteEdgeWithId(edge.id);
     });
 
+    var vLabels = labels.filter(function(label) {
+        return label.v_id === id;
+    });
+    vLabels.forEach(function(label) {
+        deleteLabelWithId(label.id);
+    });
+
     var index = vertices.findIndex(function(vertex) {
         return vertex.id === id;
     });
@@ -60,6 +68,15 @@ function deleteEdgeWithId(id) {
     });
     if (index !== -1) {
         edges.splice(index, 1);
+    }
+}
+
+function deleteLabelWithId(id) {
+    var index = labels.findIndex(function(label) {
+        return label.id === id;
+    });
+    if (index !== -1) {
+        labels.splice(index, 1);
     }
 }
 
@@ -120,10 +137,13 @@ function updateMouseDebug() {
 }
 
 function addVertex() {
-    vertices.push(graphUtil.newVertex(
+    var v = graphUtil.newVertex(
         mouseUtil.mousePos.x,
         mouseUtil.mousePos.y
-    ));
+    );
+    var l = graphUtil.newLabel(v.id);
+    vertices.push(v);
+    labels.push(l);
 }
 
 function addEdge(v1, v2) {
@@ -150,22 +170,31 @@ function draw() {
     context.canvas.width  = window.innerWidth;
     context.canvas.height = window.innerHeight;
 
-    for (var i = 0; i < edges.length; i++) {
-        var edge = edges[i];
+    edges.forEach(function(edge) {
         var color = 'black';
         if (selectUtil.edgeIsSelected(edge.id)) {
             color = 'red';
         }
         canvasUtil.drawLine(context, getVertexById(edge.v1), getVertexById(edge.v2), color);
-    }
-    for (var i = 0; i < vertices.length; i++) {
-        var vertex = vertices[i];
+    });
+    vertices.forEach(function(vertex) {
         var color = 'black';
         if (selectUtil.vertexIsSelected(vertex.id)) {
             color = 'red';
         };
         canvasUtil.drawCircle(context, vertex, VERTEX_RADIUS, color);
-    }
+    });
+    labels.forEach(function(label) {
+        var v = getVertexById(label.v_id);
+        var color = 'black';
+        if (selectUtil.vertexIsSelected(v.id)) {
+            color = 'red';
+        }
+        canvasUtil.drawText(context, label.text, {
+            x: v.x + label.x,
+            y: v.y - label.y
+        }, color);
+    });
 
     updateMouseDebug();
 }
