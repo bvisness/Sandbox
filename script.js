@@ -12,6 +12,7 @@ var edges = [];
 var mode = 'vertex';
 
 var selected = [];
+var activeThing = null;
 
 var env = 'pc';
 if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
@@ -175,27 +176,17 @@ function init() {
 
     mouseUtil.init(canvas);
     mouseUtil.registerCallback("mouseclick", function() {
-        if (mode == 'select') {
-            if (!selectUtil.isMultiSelect()) {
-                selected = [];
-            }
-
-            var vertId = getIdOfVertexUnderMouse();
-            if (vertId !== null) {
-                selected.push({
-                    type: 'vertex',
-                    id: vertId
-                });
-                return;
-            }
-
-            var edgeId = getIdOfEdgeUnderMouse();
-            if (edgeId !== null) {
-                selected.push({
-                    type: 'edge',
-                    id: edgeId
-                });
-                return;
+        select: if (mode == 'select') {
+            if (selectUtil.isMultiSelect()) {
+                if (activeThing !== null) {
+                    selected.push(activeThing);
+                }
+            } else {
+                if (activeThing === null) {
+                    selected = [];    
+                } else {
+                    selected = [activeThing];
+                }
             }
         } else if (mode == 'vertex') {
             addVertex();
@@ -222,6 +213,13 @@ function init() {
     });
     mouseUtil.registerCallback("mousedragstart", function() {
         draggingVertexStartPositions = {};
+        if (
+            activeThing !== null
+            && activeThing.type == 'vertex'
+            && !selectUtil.thingIsSelected(activeThing)
+        ) {
+            selected = [activeThing];
+        }
         selected.forEach(function(selectedThing) {
             if (selectedThing.type == 'vertex') {
                 var vertex = getVertexById(selectedThing.id);
@@ -248,6 +246,28 @@ function init() {
         draw();
     });
     mouseUtil.registerCallback("mousedown", function() {
+        select: if (mode == 'select') { 
+            activeThing = null;
+
+            var vertId = getIdOfVertexUnderMouse();
+            if (vertId !== null && !selectUtil.vertexIsSelected(vertId)) {
+                activeThing = {
+                    type: 'vertex',
+                    id: vertId
+                };
+                break select;
+            }
+
+            var edgeId = getIdOfEdgeUnderMouse();
+            if (edgeId !== null && !selectUtil.edgeIsSelected(edgeId)) {
+                activeThing = {
+                    type: 'edge',
+                    id: edgeId
+                };
+                break select;
+            }
+        }
+
         draw();
     });
     mouseUtil.registerCallback("mouseup", function() {

@@ -21,3 +21,11 @@ selectUtil.edgeIsSelected = function(id) {
 
     return result !== undefined;
 }
+
+selectUtil.thingIsSelected = function(thing) {
+    var result = selected.find(function(selectedThing) {
+        return selectedThing.type == thing.type && selectedThing.id === thing.id;
+    });
+
+    return result !== undefined;
+}
