@@ -5,6 +5,8 @@ var draggingVertexStartPositions;
 
 var VERTEX_RADIUS = 5;
 var EDGE_DISTANCE_THRESHOLD = 1;
+var EDGE_FORWARD_OFFSET = 10;
+var EDGE_OUTWARD_OFFSET = 10;
 
 var vertices = [];
 var edges = [];
@@ -78,6 +80,111 @@ function deleteLabelWithId(id) {
     if (index !== -1) {
         labels.splice(index, 1);
     }
+}
+
+/**
+ * Gets the points that are used when drawing an edge. Even straight edges
+ * will have four points.
+ *
+ * This function always returns an array of four points.
+ */
+function getPointsForEdge(id) {
+    /**
+     * Returns a normalized version of v.
+     */
+    function normalized(v) {
+        var length = Math.sqrt(v.x * v.x + v.y * v.y);
+        if (length === 0) {
+            return {
+                x: 0,
+                y: 0
+            };
+        }
+
+        return {
+            x: v.x / length,
+            y: v.y / length
+        }
+    }
+
+    // Get the edge and its vertices to work with. If necessary, we swap v1
+    // and v2 so that v1.id < v2.id. This ensures that the vector from one
+    // vertex to the next is always the same direction for all edges.
+    var edge = getEdgeById(id);
+    var v1 = getVertexById(edge.v1);
+    var v2 = getVertexById(edge.v2);
+    if (v1.id > v2.id) {
+        var vTmp = v1;
+        v1 = v2;
+        v2 = vTmp;
+    }
+
+    // Get all edges that are adjacent to v1 and v2.
+    var edgesForVertices = edges.filter(function(otherEdge) {
+        return (otherEdge.v1 === v1.id && otherEdge.v2 === v2.id)
+            || (otherEdge.v1 === v2.id && otherEdge.v2 === v1.id);
+    });
+
+    // Figure out which side of (v2 - v1) the edge should be drawn on, based
+    // on the index of the edge in the set of all edges from v1 to v2.
+    var indexRelativeToVertex = edgesForVertices.findIndex(function(otherEdge) {
+        return otherEdge.id === id;
+    });
+    var side = (indexRelativeToVertex % 2 == 1) ? 'left' : 'right';
+    if (indexRelativeToVertex === 0) {
+        side = 'straight';
+    }
+
+    // Calculate some useful vectors
+    var v1v2_n = normalized({
+        x: v2.x - v1.x,
+        y: v2.y - v1.y
+    });
+    var forward = {
+        x: v1v2_n.x * EDGE_FORWARD_OFFSET,
+        y: v1v2_n.y * EDGE_FORWARD_OFFSET
+    };
+    if (side == 'left') {
+        var outward_n = {
+            x: -v1v2_n.y,
+            y: v1v2_n.x
+        };
+    } else if (side == 'right') {
+        var outward_n = {
+            x: v1v2_n.y,
+            y: -v1v2_n.x
+        };
+    } else {
+        var outward_n = {
+            x: 0,
+            y: 0
+        }
+    }
+    var outward = {
+        x: outward_n.x * EDGE_OUTWARD_OFFSET * Math.ceil(indexRelativeToVertex / 2),
+        y: outward_n.y * EDGE_OUTWARD_OFFSET * Math.ceil(indexRelativeToVertex / 2),
+    };
+
+    // Fill up the array of points and return it
+    var points = [];
+    points.push({ // v1
+        x: v1.x,
+        y: v1.y
+    });
+    points.push({ // point 1
+        x: v1.x + forward.x + outward.x,
+        y: v1.y + forward.y + outward.y
+    });
+    points.push({ // point 2
+        x: v2.x - forward.x + outward.x,
+        y: v2.y - forward.y + outward.y
+    });
+    points.push({ // v2
+        x: v2.x,
+        y: v2.y
+    });
+
+    return points;
 }
 
 function getIdOfVertexUnderMouse() {
@@ -175,7 +282,10 @@ function draw() {
         if (selectUtil.edgeIsSelected(edge.id)) {
             color = 'red';
         }
-        canvasUtil.drawLine(context, getVertexById(edge.v1), getVertexById(edge.v2), color);
+        var points = getPointsForEdge(edge.id);
+        for (var i = 0; i < 4 - 1; i++) {
+            canvasUtil.drawLine(context, points[i], points[i + 1], color);    
+        }
     });
     vertices.forEach(function(vertex) {
         var color = 'black';
