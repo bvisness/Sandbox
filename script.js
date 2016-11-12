@@ -12,7 +12,7 @@ var vertices = [];
 var edges = [];
 var labels = [];
 
-var mode = 'vertex';
+var mode;
 
 var selected = [];
 var activeThing = null;
@@ -23,6 +23,7 @@ if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
 }
 
 function setMode(newMode) {
+    $('body').removeClass(mode).addClass(newMode);
     mode = newMode;
     selected = [];
     $('.debug-mode').text(mode);
@@ -315,6 +316,8 @@ function draw() {
 function init() {
     canvas = document.getElementById('myCanvas');
     context = canvas.getContext('2d');
+
+    setMode('vertex');
 
     mouseUtil.init(canvas);
     mouseUtil.registerCallback("mouseclick", function() {

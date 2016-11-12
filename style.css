@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -8,6 +12,7 @@ body {
 }
 
 .debug {
+    display: none;
     position: absolute;
     z-index: 1;
     top: 0;
@@ -17,6 +22,81 @@ body {
 .controls {
     position: absolute;
     z-index: 1;
-    bottom: 0;
+    top: 0;
     left: 0;
+    padding: 10px;
+    width: 250px;
+}
+
+.controls .control {
+    position: relative;
+}
+
+.controls .button {
+    width: 50px;
+    height: 50px;
+    display: block;
+    position: relative;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.controls .button:hover {
+    background-color: #f2f2f2;
+}
+
+.controls .button:active {
+    background-color: #e8e8e8;
+}
+
+.controls .button img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.controls .callout {
+    width: auto;
+    display: none;
+    position: absolute;
+    left: 60px;
+    top: 50%;
+    margin-top: -13px;
+    background-color: #f2f2f2;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+.controls .callout::after {
+    content: '';
+    width: 5px;
+    height: 5px;
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    margin-top: -3px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-width: 0 0 1px 1px;
+    transform: rotateZ(45deg);
+}
+
+.controls .button:hover + .callout {
+    display: block;
+}
+
+body.select .button.select,
+body.vertex .button.vertex,
+body.edge .button.edge
+{
+    border: 2px solid #0ac0f7;
 }

@@ -26,9 +26,24 @@
         <p>Mode: <span class="debug-mode"></span></p>
     </div>
     <div class="controls">
-        <button onclick="setMode('select');">Select</button>
-        <button onclick="setMode('vertex');">Create Vertices</button>
-        <button onclick="setMode('edge');">Create Edges</button>
+        <div class="control">
+            <div class="button select" onclick="setMode('select');">
+                <img src="images/cursor.svg">
+            </div>
+            <div class="callout">Select</div>
+        </div>
+        <div class="control">
+            <div class="button vertex" onclick="setMode('vertex');">
+                <img src="images/vertex.svg">
+            </div>
+            <div class="callout">Create Vertices</div>
+        </div>
+        <div class="control">
+            <div class="button edge" onclick="setMode('edge');">
+                <img src="images/edge.svg">
+            </div>
+            <div class="callout">Create Edges</div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
