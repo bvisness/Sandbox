@@ -212,13 +212,16 @@ function getIdOfEdgeUnderMouse() {
     }
 
     var pos = mouseUtil.mousePos;
-    for (var i = 0; i < edges.length; i++) {
-        var edge = edges[i];
-        var v1 = getVertexById(edge.v1);
-        var v2 = getVertexById(edge.v2);
-        var distanceDiff = (distance(v1, pos) + distance(pos, v2)) - distance(v1, v2);
-        if (distanceDiff <= EDGE_DISTANCE_THRESHOLD) {
-            return edge.id;
+    for (var edgeIndex = 0; edgeIndex < edges.length; edgeIndex++) {
+        var edge = edges[edgeIndex];
+        var points = getPointsForEdge(edge.id);
+        for (var i = 0; i < 4 - 1; i++) {
+            var distanceThroughMouse = distance(points[i], pos) + distance(pos, points[i + 1]);
+            var distanceDirectly = distance(points[i], points[i + 1]);
+            var distanceDiff = distanceThroughMouse - distanceDirectly;
+            if (distanceDiff <= EDGE_DISTANCE_THRESHOLD) {
+                return edge.id;
+            }
         }
     }
 
