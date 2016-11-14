@@ -25,7 +25,7 @@
         <p>Mouse pos: <span class="debug-mousepos"></span></p>
         <p>Mode: <span class="debug-mode"></span></p>
     </div>
-    <div class="controls">
+    <div class="controls top left">
         <div class="control">
             <div class="button select" onclick="setMode('select');">
                 <img src="images/cursor.svg">
@@ -43,6 +43,14 @@
                 <img src="images/edge.svg">
             </div>
             <div class="callout">Create Edges</div>
+        </div>
+    </div>
+    <div class="controls bottom left">
+        <div class="control">
+            <div class="button" onclick="newGraph();">
+                <img src="images/new.svg">
+            </div>
+            <div class="callout">New Graph</div>
         </div>
     </div>
     <script src="script.js"></script>

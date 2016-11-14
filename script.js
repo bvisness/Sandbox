@@ -8,14 +8,14 @@ var EDGE_DISTANCE_THRESHOLD = 1;
 var EDGE_FORWARD_OFFSET = 10;
 var EDGE_OUTWARD_OFFSET = 10;
 
-var vertices = [];
-var edges = [];
-var labels = [];
+var vertices;
+var edges;
+var labels;
 
 var mode;
 
-var selected = [];
-var activeThing = null;
+var selected;
+var activeThing;
 
 var env = 'pc';
 if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
@@ -277,6 +277,22 @@ function deleteSelected() {
     selected = [];
 }
 
+function newGraph() {
+    if (vertices.length === 0 || window.confirm('Are you sure you want to make a new graph? Any unsaved progress will be lost.')) {
+        clearAll();
+    }
+}
+
+function clearAll() {
+    vertices = [];
+    edges = [];
+    labels = [];
+    selected = [];
+    activeThing = null;
+    setMode('vertex');
+    graphUtil.resetCounters();
+}
+
 function draw() {
     context.canvas.width  = window.innerWidth;
     context.canvas.height = window.innerHeight;
@@ -317,7 +333,7 @@ function init() {
     canvas = document.getElementById('myCanvas');
     context = canvas.getContext('2d');
 
-    setMode('vertex');
+    clearAll();
 
     mouseUtil.init(canvas);
     mouseUtil.registerCallback("mouseclick", function() {

@@ -30,3 +30,9 @@ graphUtil.newLabel = function(_v_id, _text = null) {
         y: 8
     }
 }
+
+graphUtil.resetCounters = function() {
+    graphUtil.vertexCounter = 0;
+    graphUtil.edgeCounter = 0;
+    graphUtil.labelCounter = 0;
+}
