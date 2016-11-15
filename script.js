@@ -523,6 +523,11 @@ function init() {
                 deleteSelected();
                 break;
             }
+            case 27: { // esc
+                selected = [];
+                activeThing = null;
+                break;
+            }
             case 46: { // forward delete
                 deleteSelected();
                 break;
