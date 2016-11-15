@@ -654,6 +654,9 @@ function init() {
     $('.dialog.mathematica textarea').on('focus', function() {
         $(this).select();
     });
+    $('.overlay').on('click', function() {
+        $('.dialog.show').removeClass('show');
+    });
 }
 
 init();

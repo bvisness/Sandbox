@@ -154,6 +154,7 @@ body.edge .button.edge
     border: 1px solid #ddd;
     border-radius: 2px;
     resize: none;
+    font-family: monospace;
 }
 
 .dialog .top-bar {
@@ -176,6 +177,13 @@ body.edge .button.edge
     border-radius: 2px;
     border: 1px solid #ddd;
     cursor: pointer;
+    background-image: url('images/close.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.dialog .top-bar .close:active {
+    background-color: #f8f8f8;
 }
 
 .overlay {
