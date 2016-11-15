@@ -337,10 +337,41 @@ function importFile() {
         });
 
         setMode('select');
+        centerGraph();
         draw();
     };
 
     reader.readAsBinaryString(files[0]);
+}
+
+function centerGraph() {
+    var x_max, x_min;
+    var y_max, y_min;
+    vertices.forEach(function(vertex) {
+        if (x_max === undefined || vertex.x > x_max) {
+            x_max = vertex.x;
+        }
+        if (x_min === undefined || vertex.x < x_min) {
+            x_min = vertex.x;
+        }
+        if (y_max === undefined || vertex.y > y_max) {
+            y_max = vertex.y;
+        }
+        if (y_min === undefined || vertex.y < y_min) {
+            y_min = vertex.y;
+        }
+    });
+
+    var center_x = x_min + Math.floor((x_max - x_min) / 2);
+    var center_y = y_min + Math.floor((y_max - y_min) / 2);
+
+    var window_center_x = Math.floor(window.innerWidth / 2);
+    var window_center_y = Math.floor(window.innerHeight / 2);
+
+    vertices.forEach(function(vertex) {
+        vertex.x += window_center_x - center_x;
+        vertex.y += window_center_y - center_y;
+    });
 }
 
 function draw() {
@@ -513,6 +544,11 @@ function init() {
                         });
                     });
                 }
+                break;
+            }
+            case 67: { // c
+                centerGraph();
+                break;
             }
         }
 
