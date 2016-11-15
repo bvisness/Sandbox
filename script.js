@@ -550,6 +550,18 @@ function init() {
                 centerGraph();
                 break;
             }
+            case 69: { // e
+                setMode('edge');
+                break;
+            }
+            case 83: { // s
+                setMode('select');
+                break;
+            }
+            case 86: { // v
+                setMode('vertex');
+                break;
+            }
         }
 
         draw();
