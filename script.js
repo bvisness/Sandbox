@@ -344,6 +344,39 @@ function importFile() {
     reader.readAsBinaryString(files[0]);
 }
 
+function exportFile() {
+    var graph_xml = $('<graph></graph>');
+    vertices.forEach(function(vertex) {
+        var v_xml = $('<vertex fill="solid" radius="2"></vertex>');
+        $(v_xml)
+            .attr('ident', 'V' + vertex.id)
+            .attr('x', vertex.x)
+            .attr('y', vertex.y);
+        $(graph_xml).append(v_xml);
+    });
+    edges.forEach(function(edge) {
+        var e_xml = $('<edge arrowhead="none" fill="solid" width="thin"></edge>');
+        $(e_xml)
+            .attr('ident', 'E' + edge.id)
+            .attr('initvert', 'V' + edge.v1)
+            .attr('finalvert', 'V' + edge.v2);
+        $(graph_xml).append(e_xml);
+    });
+    labels.forEach(function(label) {
+        var l_xml = $('<label font="Courier" size="12" bold="false"></label>');
+        var vertex = getVertexById(label.v_id);
+        $(l_xml)
+            .attr('owner', 'V' + label.v_id)
+            .attr('x', vertex.x + graphUtil.LABEL_SPACING)
+            .attr('y', vertex.y + graphUtil.LABEL_SPACING)
+            .text(label.text);
+        $(graph_xml).append(l_xml);
+    });
+
+    var blob = new Blob([$(graph_xml)[0].outerHTML], {type: "text/xml"});
+    saveAs(blob, 'graph.xml'); // from FileSaver.min.js
+}
+
 function centerGraph() {
     var x_max, x_min;
     var y_max, y_min;

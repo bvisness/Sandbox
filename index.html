@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css" />
 
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="FileSaver.min.js"></script>
     <script src="mouseUtil.js"></script>
     <script src="canvasUtil.js"></script>
     <script src="graphUtil.js"></script>
@@ -57,6 +58,12 @@
                 <img src="images/open.svg">
             </div>
             <div class="callout">Open Graph</div>
+        </div>
+        <div class="control">
+            <div class="button" onclick="exportFile();">
+                <img src="images/save.svg">
+            </div>
+            <div class="callout">Save Graph</div>
         </div>
     </div>
     <input id="file" type="file" accept=".xml" style="display: none">

@@ -1,5 +1,7 @@
 var graphUtil = {};
 
+graphUtil.LABEL_SPACING = 8;
+
 graphUtil.vertexCounter = 0;
 graphUtil.edgeCounter = 0;
 graphUtil.labelCounter = 0;
@@ -26,8 +28,8 @@ graphUtil.newLabel = function(_v_id, _text = null) {
         id: _id,
         text: (_text === null) ? String.fromCharCode(97 + _id) : _text,
         v_id: _v_id,
-        x: 8,
-        y: 8
+        x: graphUtil.LABEL_SPACING,
+        y: graphUtil.LABEL_SPACING
     }
 }
 
