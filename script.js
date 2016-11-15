@@ -5,8 +5,8 @@ var draggingVertexStartPositions;
 
 var VERTEX_RADIUS = 5;
 var EDGE_DISTANCE_THRESHOLD = 1;
-var EDGE_FORWARD_OFFSET = 10;
-var EDGE_OUTWARD_OFFSET = 10;
+var EDGE_FORWARD_OFFSET = 20;
+var EDGE_OUTWARD_OFFSET = 20;
 
 var vertices;
 var edges;
