@@ -65,9 +65,28 @@
             </div>
             <div class="callout">Save Graph</div>
         </div>
+        <div class="control">
+            <div class="button" onclick="showMathematica();">
+                <img src="images/mma.svg">
+            </div>
+            <div class="callout">Copy to Mathematica</div>
+        </div>
     </div>
     <div class="copyright bottom right">Made in 2016 by Ben Visness.</div>
     <input id="file" type="file" accept=".xml" style="display: none">
+
+    <div class="dialog mathematica">
+        <div class="top-bar">
+            <div class="close" onclick="$('.dialog.mathematica').removeClass('show');"></div>
+            <div class="title">Copy to <em>Mathematica</em></div>
+        </div>
+        <div class="content">
+            Copy and paste the following code to view this graph in <em>Mathematica</em>:
+            <textarea readonly></textarea>
+        </div>
+    </div>
+    <div class="overlay"></div>
+
     <script src="script.js"></script>
 </body>
 

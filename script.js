@@ -377,6 +377,38 @@ function exportFile() {
     saveAs(blob, 'graph.xml'); // from FileSaver.min.js
 }
 
+function showMathematica() {
+    var result = 'Graph[';
+
+    var max_y = 0;
+    vertices.forEach(function(vertex) {
+        if (vertex.y > max_y) {
+            max_y = vertex.y;
+        }
+    });
+
+    var mma_vs = vertices.map(function(vertex) {
+        return vertex.id;
+    });
+    result += '{' + mma_vs.join(',') + '},';
+
+    var mma_es = edges.map(function(edge) {
+        return + edge.v1 + '<->' + edge.v2;
+    });
+    result += '{' + mma_es.join(',') + '},';
+
+    var mma_vcs = vertices.map(function(vertex) {
+        return '{' + vertex.x + ',' + (max_y - vertex.y) + '}';
+    });
+    result += 'VertexCoordinates->{' + mma_vcs.join(',') + '}';
+
+    result += ']';
+
+    $('.dialog.mathematica textarea').text(result);
+    $('.dialog.mathematica').addClass('show');
+    $('.dialog.mathematica textarea').focus();
+}
+
 function centerGraph() {
     var x_max, x_min;
     var y_max, y_min;
@@ -557,6 +589,11 @@ function init() {
                 break;
             }
             case 27: { // esc
+                if ($('.dialog.show').length > 0) {
+                    $('.dialog.show').removeClass('show');
+                    return;
+                }
+
                 selected = [];
                 activeThing = null;
                 break;
@@ -612,6 +649,10 @@ function init() {
 
         importFile();
         $('#file').val('');
+    });
+
+    $('.dialog.mathematica textarea').on('focus', function() {
+        $(this).select();
     });
 }
 
