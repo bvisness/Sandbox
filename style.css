@@ -26,16 +26,20 @@ body {
     width: 250px;
 }
 
-.controls.top {
+.top {
     top: 0;
 }
 
-.controls.bottom {
+.bottom {
     bottom: 0;
 }
 
-.controls.left {
+.left {
     left: 0;
+}
+
+.right {
+    right: 0;
 }
 
 .controls .control {
@@ -113,4 +117,10 @@ body.vertex .button.vertex,
 body.edge .button.edge
 {
     border: 2px solid #0ac0f7;
+}
+
+.copyright {
+    position: absolute;
+    padding: 10px;
+    color: #ccc;
 }
