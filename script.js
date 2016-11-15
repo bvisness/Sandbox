@@ -280,7 +280,10 @@ function deleteSelected() {
 function newGraph() {
     if (vertices.length === 0 || window.confirm('Are you sure you want to make a new graph? Any unsaved progress will be lost.')) {
         clearAll();
+        return true;
     }
+
+    return false;
 }
 
 function clearAll() {
@@ -291,6 +294,53 @@ function clearAll() {
     activeThing = null;
     setMode('vertex');
     graphUtil.resetCounters();
+}
+
+function importFile() {
+    var files = $('#file')[0].files;
+    if(files.length == 0) {
+        return;
+    }
+
+    if (!newGraph()) {
+        return;
+    }
+
+    var reader = new FileReader();
+    var contents;
+
+    reader.onload = function(e) {
+        contents = e.target.result;
+        
+        var doc = $.parseXML(contents);
+        $(doc).find('vertex').each(function(i, e) {
+            graphUtil.vertexCounter++;
+            vertices.push({
+                id: parseInt($(e).attr('ident').substring(1), 10),
+                x: parseInt($(e).attr('x'), 10),
+                y: parseInt($(e).attr('y'), 10)
+            });
+        });
+        $(doc).find('edge').each(function(i, e) {
+            graphUtil.edgeCounter++;
+            edges.push({
+                id: parseInt($(e).attr('ident').substring(1), 10),
+                v1: parseInt($(e).attr('initvert').substring(1), 10),
+                v2: parseInt($(e).attr('finalvert').substring(1), 10)
+            });
+        });
+        $(doc).find('label').each(function(i, e) {
+            var v_id = parseInt($(e).attr('owner').substring(1), 10)
+            var label = graphUtil.newLabel(v_id);
+            label.text = $(e).text();
+            labels.push(label);
+        });
+
+        setMode('select');
+        draw();
+    };
+
+    reader.readAsBinaryString(files[0]);
 }
 
 function draw() {
@@ -468,6 +518,15 @@ function init() {
 
         draw();
     }, false);
+
+    $('#file').on('change', function() {
+        if (!$('#file').val()) {
+            return;
+        }
+
+        importFile();
+        $('#file').val('');
+    });
 }
 
 init();
