@@ -11,6 +11,10 @@ body {
     user-select: none;
 }
 
+canvas {
+    display: block;
+}
+
 .debug {
     display: none;
     position: absolute;

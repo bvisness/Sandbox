@@ -440,8 +440,9 @@ function centerGraph() {
 }
 
 function draw() {
-    context.canvas.width  = window.innerWidth;
-    context.canvas.height = window.innerHeight;
+    var html = $('html')[0];
+    context.canvas.width  = html.clientWidth;
+    context.canvas.height = html.clientHeight;
 
     edges.forEach(function(edge) {
         var color = 'black';
