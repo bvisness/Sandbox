@@ -373,7 +373,10 @@ function exportFile() {
         $(graph_xml).append(l_xml);
     });
 
-    var blob = new Blob([$(graph_xml)[0].outerHTML], {type: "text/xml"});
+    var xml_string = $(graph_xml)[0].outerHTML;
+    xml_string = '<?xml version="1.0"?><!DOCTYPE graph SYSTEM "graph.dtd">' + xml_string;
+
+    var blob = new Blob([xml_string], {type: "text/xml"});
     saveAs(blob, 'graph.xml'); // from FileSaver.min.js
 }
 
