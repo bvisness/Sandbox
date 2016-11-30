@@ -403,7 +403,9 @@ function showMathematica() {
     var mma_vcs = vertices.map(function(vertex) {
         return '{' + vertex.x + ',' + (max_y - vertex.y) + '}';
     });
-    result += 'VertexCoordinates->{' + mma_vcs.join(',') + '}';
+    result += 'VertexCoordinates->{' + mma_vcs.join(',') + '},';
+
+    result += 'VertexLabels->"Name"'
 
     result += ']';
 
