@@ -28,6 +28,7 @@ canvas {
     z-index: 1;
     padding: 10px;
     width: 250px;
+    pointer-events: none;
 }
 
 .top {
@@ -62,6 +63,7 @@ canvas {
     border-radius: 3px;
     outline: none;
     cursor: pointer;
+    pointer-events: all;
 }
 
 .controls .control:last-of-type .button {
