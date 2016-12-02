@@ -17,6 +17,8 @@ var mode;
 var selected;
 var activeThing;
 
+var undoStack = [];
+
 var env = 'pc';
 if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
     env = 'mac';
@@ -248,6 +250,8 @@ function updateMouseDebug() {
 }
 
 function addVertex() {
+    saveUndoState();
+
     var v = graphUtil.newVertex(
         mouseUtil.mousePos.x,
         mouseUtil.mousePos.y
@@ -258,6 +262,8 @@ function addVertex() {
 }
 
 function addEdge(v1, v2) {
+    saveUndoState();
+
     if (v1 == v2) {
         return;
     }
@@ -266,6 +272,8 @@ function addEdge(v1, v2) {
 }
 
 function deleteSelected() {
+    saveUndoState();
+
     selected.forEach(function(selectedThing) {
         if (selectedThing.type == 'edge') {
             deleteEdgeWithId(selectedThing.id);
@@ -444,6 +452,33 @@ function centerGraph() {
     });
 }
 
+function saveUndoState() {
+    undoStack.push({
+        vertices: JSON.parse(JSON.stringify(vertices)),
+        edges: JSON.parse(JSON.stringify(edges)),
+        labels: JSON.parse(JSON.stringify(labels)),
+        vertexCounter: graphUtil.vertexCounter,
+        edgeCounter: graphUtil.edgeCounter,
+        labelCounter: graphUtil.labelCounter
+    });
+}
+
+function undo() {
+    if (undoStack.length <= 0) {
+        return;
+    }
+
+    var state = undoStack.pop();
+    vertices = state.vertices;
+    edges = state.edges;
+    labels = state.labels;
+    graphUtil.vertexCounter = state.vertexCounter;
+    graphUtil.edgeCounter = state.edgeCounter;
+    graphUtil.labelCounter = state.labelCounter;
+
+    draw();
+}
+
 function draw() {
     var html = $('html')[0];
     context.canvas.width  = html.clientWidth;
@@ -532,6 +567,9 @@ function init() {
             && !selectUtil.thingIsSelected(activeThing)
         ) {
             selected = [activeThing];
+        }
+        if (selected.length > 0) {
+            saveUndoState();
         }
         selected.forEach(function(selectedThing) {
             if (selectedThing.type == 'vertex') {
@@ -641,6 +679,12 @@ function init() {
             }
             case 86: { // v
                 setMode('vertex');
+                break;
+            }
+            case 90: { // z
+                if (keyUtil.isPlatformCtrlKey()) {
+                    undo();
+                }
                 break;
             }
         }
