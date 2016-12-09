@@ -404,7 +404,7 @@ function showMathematica() {
     result += '{' + mma_vs.join(',') + '},';
 
     var mma_es = edges.map(function(edge) {
-        return + edge.v1 + '<->' + edge.v2;
+        return edge.v1 + '<->' + edge.v2;
     });
     result += '{' + mma_es.join(',') + '},';
 
@@ -413,7 +413,10 @@ function showMathematica() {
     });
     result += 'VertexCoordinates->{' + mma_vcs.join(',') + '},';
 
-    result += 'VertexLabels->"Name"'
+    var mma_ls = labels.map(function(label) {
+        return label.v_id + '->"' + label.text + '"';
+    });
+    result += 'VertexLabels->{' + mma_ls.join(',') + '}';
 
     result += ']';
 
