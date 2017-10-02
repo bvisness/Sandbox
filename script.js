@@ -484,8 +484,8 @@ function undo() {
 
 function draw() {
     var html = $('html')[0];
-    context.canvas.width  = html.clientWidth;
-    context.canvas.height = html.clientHeight;
+    context.canvas.width  = canvasUtil.scaleForDisplay(html.clientWidth);
+    context.canvas.height = canvasUtil.scaleForDisplay(html.clientHeight);
 
     edges.forEach(function(edge) {
         var color = 'black';
@@ -694,6 +694,10 @@ function init() {
 
         draw();
     }, false);
+
+    window.addEventListener('resize', function(e) {
+        draw();
+    });
 
     $('#file').on('change', function() {
         if (!$('#file').val()) {
